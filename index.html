@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7f5">
+    <title>Little List</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f4f7f5;
+        --surface: #fff;
+        --ink: #183330;
+        --muted: #71817d;
+        --line: #e4ebe7;
+        --coral: #e66e50;
+        --teal: #347d78;
+        --yellow: #e6c65e;
+        --serif: Georgia, "Times New Roman", serif;
+        --sans: "Trebuchet MS", "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        color: var(--ink);
+        background-color: var(--paper);
+        background-image: repeating-linear-gradient(135deg, transparent 0 24px, rgb(52 125 120 / 3%) 24px 25px);
+        font-family: var(--sans);
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        color: inherit;
+      }
+
+      .page {
+        width: min(100% - 48px, 920px);
+        margin: 0 auto;
+        padding: 44px 0 32px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 26px;
+        border-bottom: 1px solid rgb(24 51 48 / 13%);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--ink);
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 9px 9px 9px 3px;
+        background: var(--coral);
+        color: white;
+        font-size: 20px;
+        line-height: 1;
+      }
+
+      .local-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .local-note::before {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--teal);
+        content: "";
+      }
+
+      main {
+        width: min(100%, 650px);
+        margin: 67px auto 0;
+      }
+
+      .eyebrow {
+        margin: 0 0 13px;
+        color: var(--teal);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 48px;
+        font-weight: 400;
+        line-height: 1.12;
+      }
+
+      .subtitle {
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .add-form {
+        display: flex;
+        gap: 10px;
+        margin-top: 34px;
+      }
+
+      .task-input {
+        min-width: 0;
+        height: 54px;
+        flex: 1;
+        padding: 0 17px;
+        border: 1px solid #dce5e0;
+        border-radius: 7px;
+        outline: none;
+        background: var(--surface);
+        color: var(--ink);
+        font-size: 15px;
+        transition: border-color 140ms ease, box-shadow 140ms ease;
+      }
+
+      .task-input::placeholder {
+        color: #99a7a2;
+      }
+
+      .task-input:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgb(52 125 120 / 13%);
+      }
+
+      .add-button {
+        min-width: 112px;
+        height: 54px;
+        padding: 0 19px;
+        border: 0;
+        border-radius: 7px;
+        background: var(--ink);
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: background 140ms ease, transform 140ms ease;
+      }
+
+      .add-button:hover {
+        transform: translateY(-1px);
+        background: var(--teal);
+      }
+
+      .list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 39px;
+        padding-bottom: 13px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .filters {
+        display: flex;
+        gap: 5px;
+      }
+
+      .filter-button {
+        min-height: 34px;
+        padding: 0 11px;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .filter-button:hover {
+        color: var(--ink);
+      }
+
+      .filter-button[aria-pressed="true"] {
+        background: #e2eeea;
+        color: var(--teal);
+        font-weight: 700;
+      }
+
+      .task-count {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .task-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .task-row {
+        display: flex;
+        min-height: 65px;
+        align-items: center;
+        gap: 14px;
+        border-bottom: 1px solid var(--line);
+        animation: appear 180ms ease both;
+      }
+
+      .task-check {
+        width: 19px;
+        height: 19px;
+        flex: 0 0 19px;
+        margin: 0;
+        accent-color: var(--teal);
+        cursor: pointer;
+      }
+
+      .task-text {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere;
+        font-size: 15px;
+        line-height: 1.45;
+      }
+
+      .task-row.is-complete .task-text {
+        color: #94a19c;
+        text-decoration: line-through;
+        text-decoration-color: #aab7b2;
+      }
+
+      .delete-button {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        place-items: center;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: #98a49f;
+        cursor: pointer;
+        font-size: 21px;
+        line-height: 1;
+      }
+
+      .delete-button:hover {
+        background: #fae9e4;
+        color: var(--coral);
+      }
+
+      .empty-state {
+        display: grid;
+        min-height: 150px;
+        place-content: center;
+        gap: 7px;
+        text-align: center;
+      }
+
+      .empty-state[hidden] {
+        display: none;
+      }
+
+      .empty-mark {
+        width: 34px;
+        height: 34px;
+        margin: 0 auto 3px;
+        border: 1px solid #cbded7;
+        border-radius: 50%;
+        color: var(--teal);
+        font-family: var(--serif);
+        font-size: 20px;
+        line-height: 32px;
+      }
+
+      .empty-title {
+        margin: 0;
+        font-family: var(--serif);
+        font-size: 20px;
+      }
+
+      .empty-copy {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .list-footer {
+        display: flex;
+        min-height: 48px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .clear-button {
+        padding: 7px 0 7px 10px;
+        border: 0;
+        background: transparent;
+        color: var(--coral);
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .clear-button:hover {
+        text-decoration: underline;
+      }
+
+      button:focus-visible,
+      input:focus-visible {
+        outline: 3px solid rgb(52 125 120 / 38%);
+        outline-offset: 2px;
+      }
+
+      @keyframes appear {
+        from { opacity: 0; transform: translateY(4px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @media (max-width: 560px) {
+        .page {
+          width: min(100% - 32px, 650px);
+          padding-top: 24px;
+        }
+
+        .topbar {
+          padding-bottom: 19px;
+        }
+
+        .local-note {
+          font-size: 11px;
+        }
+
+        main {
+          margin-top: 49px;
+        }
+
+        h1 {
+          font-size: 38px;
+        }
+
+        .add-form {
+          gap: 8px;
+          margin-top: 27px;
+        }
+
+        .add-button {
+          min-width: 92px;
+          padding: 0 12px;
+        }
+
+        .list-header {
+          align-items: flex-end;
+          margin-top: 30px;
+        }
+
+        .filters {
+          gap: 0;
+        }
+
+        .filter-button {
+          padding: 0 8px;
+          font-size: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">+</span> Little List</div>
+        <div class="local-note">Saved on this device</div>
+      </header>
+
+      <main>
+        <p class="eyebrow" id="today-label"></p>
+        <h1>A little more done.</h1>
+        <p class="subtitle">Make room for what matters today.</p>
+
+        <form class="add-form" id="add-form">
+          <label class="visually-hidden" for="task-input">New task</label>
+          <input class="task-input" id="task-input" name="task" type="text" maxlength="240" placeholder="What needs doing?" autocomplete="off" required>
+          <button class="add-button" type="submit">Add task</button>
+        </form>
+
+        <section aria-label="Tasks">
+          <div class="list-header">
+            <div class="filters" role="group" aria-label="Filter tasks">
+              <button class="filter-button" type="button" data-filter="all" aria-pressed="true">All</button>
+              <button class="filter-button" type="button" data-filter="active" aria-pressed="false">To do</button>
+              <button class="filter-button" type="button" data-filter="completed" aria-pressed="false">Done</button>
+            </div>
+            <span class="task-count" id="task-count" aria-live="polite"></span>
+          </div>
+          <ul class="task-list" id="task-list"></ul>
+          <div class="empty-state" id="empty-state" hidden>
+            <span class="empty-mark" aria-hidden="true">✓</span>
+            <p class="empty-title" id="empty-title">Nothing on the list.</p>
+            <p class="empty-copy" id="empty-copy">Add a task and take it one step at a time.</p>
+          </div>
+          <footer class="list-footer">
+            <span>One thing at a time.</span>
+            <button class="clear-button" id="clear-button" type="button" hidden>Clear completed</button>
+          </footer>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const STORAGE_KEY = "little-list.tasks.v1";
+      const form = document.querySelector("#add-form");
+      const input = document.querySelector("#task-input");
+      const list = document.querySelector("#task-list");
+      const count = document.querySelector("#task-count");
+      const emptyState = document.querySelector("#empty-state");
+      const emptyTitle = document.querySelector("#empty-title");
+      const emptyCopy = document.querySelector("#empty-copy");
+      const clearButton = document.querySelector("#clear-button");
+      const filterButtons = [...document.querySelectorAll("[data-filter]")];
+      let activeFilter = "all";
+      let tasks = loadTasks();
+
+      function loadTasks() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+          if (!Array.isArray(saved)) return [];
+          return saved.filter(task =>
+            task && typeof task.id === "string" && typeof task.text === "string" && typeof task.completed === "boolean"
+          );
+        } catch {
+          return [];
+        }
+      }
+
+      function saveTasks() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+        } catch {
+          count.textContent = "Storage unavailable";
+        }
+      }
+
+      function render() {
+        const visibleTasks = tasks.filter(task => {
+          if (activeFilter === "active") return !task.completed;
+          if (activeFilter === "completed") return task.completed;
+          return true;
+        });
+        const remaining = tasks.filter(task => !task.completed).length;
+        list.replaceChildren();
+
+        for (const task of visibleTasks) {
+          const row = document.createElement("li");
+          row.className = `task-row${task.completed ? " is-complete" : ""}`;
+
+          const checkbox = document.createElement("input");
+          checkbox.className = "task-check";
+          checkbox.type = "checkbox";
+          checkbox.checked = task.completed;
+          checkbox.setAttribute("aria-label", `Mark ${task.text} ${task.completed ? "to do" : "done"}`);
+          checkbox.addEventListener("change", () => {
+            task.completed = checkbox.checked;
+            saveTasks();
+            render();
+          });
+
+          const text = document.createElement("span");
+          text.className = "task-text";
+          text.textContent = task.text;
+
+          const remove = document.createElement("button");
+          remove.className = "delete-button";
+          remove.type = "button";
+          remove.textContent = "×";
+          remove.setAttribute("aria-label", `Delete ${task.text}`);
+          remove.addEventListener("click", () => {
+            tasks = tasks.filter(item => item.id !== task.id);
+            saveTasks();
+            render();
+          });
+
+          row.append(checkbox, text, remove);
+          list.append(row);
+        }
+
+        count.textContent = `${remaining} ${remaining === 1 ? "task" : "tasks"} left`;
+        emptyState.hidden = visibleTasks.length > 0;
+        clearButton.hidden = !tasks.some(task => task.completed);
+
+        if (activeFilter === "active") {
+          emptyTitle.textContent = "All caught up.";
+          emptyCopy.textContent = "A little breathing room looks good on you.";
+        } else if (activeFilter === "completed") {
+          emptyTitle.textContent = "Nothing finished just yet.";
+          emptyCopy.textContent = "Your completed tasks will land here.";
+        } else {
+          emptyTitle.textContent = "Nothing on the list.";
+          emptyCopy.textContent = "Add a task and take it one step at a time.";
+        }
+
+        filterButtons.forEach(button => {
+          button.setAttribute("aria-pressed", String(button.dataset.filter === activeFilter));
+        });
+      }
+
+      form.addEventListener("submit", event => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+
+        tasks.unshift({ id: crypto.randomUUID(), text, completed: false });
+        activeFilter = "all";
+        saveTasks();
+        render();
+        input.value = "";
+        input.focus();
+      });
+
+      filterButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          render();
+        });
+      });
+
+      clearButton.addEventListener("click", () => {
+        tasks = tasks.filter(task => !task.completed);
+        saveTasks();
+        render();
+      });
+
+      document.querySelector("#today-label").textContent = new Intl.DateTimeFormat(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      }).format(new Date());
+
+      render();
+    </script>
+  </body>
+</html>
